@@ -1,5 +1,4 @@
 from django.core.cache import cache
-from django.shortcuts import render
 
 # Create your views here.
 from lib.http import render_json
@@ -7,6 +6,7 @@ from lib.sms import send_sms
 
 from common import keys
 from common import errors
+from user.models import User
 
 
 def submit_phone(request):
@@ -23,11 +23,13 @@ def submit_vcode(request):
 
     cache_vcode = cache.get(keys.VCODE_KEY % phone)
     if vcode == cache_vcode:
-        #登录
-        pass
+        #执行登录过程
+        user, _ = User.objects.get_or_create(phonenum=phone, nickname=phone)
+        request.session["uid"] = user.id
+        return render_json(user.to_dict())
     else:
         return render_json("验证码错误", errors.VCODE_ERR)
-    return None
+
 
 def get_profile(request):
     """获取个人资料"""

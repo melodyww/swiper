@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 
@@ -8,7 +10,7 @@ class User(models.Model):
         ("M", "男"),
         ("W", "女")
     }
-    phonenu = models.CharField(max_length=16, unique=True, verbose_name="⼿机号")
+    phonenum = models.CharField(max_length=16, unique=True, verbose_name="⼿机号")
     nickname = models.CharField(max_length=24, unique=True, verbose_name="昵称")
     sex = models.CharField(max_length=8, choices=SEX, verbose_name="性别")
     birth_year = models.IntegerField(default=2000, verbose_name="出⽣年")
@@ -18,11 +20,37 @@ class User(models.Model):
     location = models.CharField(max_length=64, verbose_name="常居地")
 
     @property
+    def age(self):
+        today = datetime.date.today()
+        birth_date = datetime.date(self.birth_year, self.birth_month, self.birth_day)
+        return (today - birth_date).days // 365
+
+    def to_dict(self):
+        return {
+            "phonenum": self.phonenum,
+            "nickname": self.nickname,
+            "sex": self.sex,
+            "age": self.age,
+            "birth_year": self.birth_year,
+            "birth_month": self.birth_month,
+            "birth_day": self.birth_day,
+            "avatar": self.avatar,
+            "location": self.location,
+
+
+
+        }
+
+
+
+    @property
     def profile(self):
         """用户对应的个人设置"""
         if not hasattr(self, "_profile"):
             self._profile, _ = Profile.objects.get_or_create(id=self.id)
         return self._profile
+
+
 
 
 class Profile(models.Model):
