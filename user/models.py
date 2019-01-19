@@ -4,6 +4,9 @@ from django.db import models
 
 
 # Create your models here.
+from lib.orm import ModelMixin
+
+
 class User(models.Model):
     """用户模型"""
     SEX = {
@@ -27,6 +30,7 @@ class User(models.Model):
 
     def to_dict(self):
         return {
+            "id": self.id,
             "phonenum": self.phonenum,
             "nickname": self.nickname,
             "sex": self.sex,
@@ -53,7 +57,7 @@ class User(models.Model):
 
 
 
-class Profile(models.Model):
+class Profile(models.Model,ModelMixin):
     """个人设置"""
     SEX = {
         ("M", "男"),

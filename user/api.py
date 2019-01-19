@@ -1,6 +1,8 @@
 from django.core.cache import cache
 
 # Create your views here.
+from django.views.decorators.http import require_GET, require_http_methods
+
 from lib.http import render_json
 from lib.sms import send_sms
 
@@ -30,10 +32,14 @@ def submit_vcode(request):
     else:
         return render_json("验证码错误", errors.VCODE_ERR)
 
-
+# @require_GET
+# @require_http_methods(['GET','POST'])
 def get_profile(request):
-    """获取个人资料"""
-    return None
+    """获取个人配置"""
+    # if request.method == 'GET':
+    uid = request.session['uid']
+    user = User.objects.get(id=uid)
+    return render_json(user.profile.to_dict())
 
 def set_profile(request):
     """设置个人资料"""
